@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// CORE TABLES
+// ============================================================
+
+model Tenant {
+  id         String   @id @default(uuid())
+  name       String
+  slug       String   @unique
+  plan       String   @default("free")
+  quotas     String   @default("{}") // JSON string
+  settings   String   @default("{}") // JSON string
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  users      User[]
+  agents     Agent[]
+}
+
+model User {
+  id           String   @id @default(uuid())
+  tenantId     String
+  tenant       Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  email        String
+  passwordHash String?
+  displayName  String?
+  role         String   @default("builder")
+  createdAt    DateTime @default(now())
+
+  @@unique([tenantId, email])
+}
+
+model Agent {
+  id            String   @id @default(uuid())
+  tenantId      String
+  tenant        Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name          String
+  description   String?
+  blueprint     String   // JSON string representing the visual canvas
+  memoryConfig  String   // JSON string representing memory tier weights/settings
+  status        String   @default("draft")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  conversationTurns  ConversationTurn[]
+  kgNodes            KgNode[]
+  episodicVectors    EpisodicVector[]
+}
+
+// ============================================================
+// MEMORY TABLES
+// ============================================================
+
+// Conversational Memory (Cross-Session Dialogue)
+model ConversationTurn {
+  id          String   @id @default(uuid())
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  sessionId   String
+  turnNumber  Int
+  role        String   // 'user' | 'assistant' | 'system' | 'tool'
+  content     String
+  metadata    String?  @default("{}") // JSON string (tokens, tool calls, etc.)
+  createdAt   DateTime @default(now())
+
+  @@unique([sessionId, turnNumber])
+  @@index([agentId, sessionId])
+}
+
+// Knowledge Graph (Semantic Memory) - Nodes
+model KgNode {
+  id          String   @id @default(uuid())
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  name        String
+  type        String   // 'person', 'organization', 'concept', etc.
+  properties  String   @default("{}") // JSON string
+
+  outgoingEdges KgEdge[] @relation("SourceNode")
+  incomingEdges KgEdge[] @relation("TargetNode")
+  
+  @@index([agentId, name])
+}
+
+// Knowledge Graph (Semantic Memory) - Edges
+model KgEdge {
+  id           String   @id @default(uuid())
+  sourceId     String
+  targetId     String
+  relationType String   // 'uses', 'knows', 'part_of', etc.
+  confidence   Float    @default(1.0)
+  
+  source       KgNode   @relation("SourceNode", fields: [sourceId], references: [id], onDelete: Cascade)
+  target       KgNode   @relation("TargetNode", fields: [targetId], references: [id], onDelete: Cascade)
+
+  @@index([sourceId])
+  @@index([targetId])
+}
+
+// Episodic Vectors (Event Log)
+// Note: We store the embedding vector as a JSON array string since SQLite does not have native vector type.
+// We will parse it in Node.js and compute dot-product locally in memory.
+model EpisodicVector {
+  id          String   @id @default(uuid())
+  agentId     String
+  agent       Agent    @relation(fields: [agentId], references: [id], onDelete: Cascade)
+  summary     String
+  vectorData  String   // JSON array of floats `[0.1, -0.2, ...]`
+  importance  Int      @default(5)
+  decayScore  Float    @default(1.0)
+  createdAt   DateTime @default(now())
+  lastAccessedAt DateTime @default(now())
+
+  @@index([agentId])
+}
+
+// Procedural Rules (How-To)
+model ProceduralRule {
+  id               String   @id @default(uuid())
+  tenantId         String
+  agentId          String?  // Null means it applies to all agents in tenant
+  name             String
+  description      String
+  ruleType         String   // 'workflow', 'behavior', 'constraint'
+  triggerCondition String   // JSON string
+  actionSequence   String   // JSON string
+  priority         Int      @default(50)
+  confidence       Float    @default(1.0)
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now())
+}
