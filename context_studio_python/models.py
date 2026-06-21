@@ -7,6 +7,14 @@ from database import Base
 def generate_uuid():
     return str(uuid.uuid4())
 
+class ApiKey(Base):
+    __tablename__ = "api_keys"
+    id = Column(String, primary_key=True, default=generate_uuid)
+    key_value = Column(String, unique=True, index=True)
+    tenant_id = Column(String, index=True)
+    is_active = Column(Integer, default=1)  # 1 for True, 0 for False
+    created_at = Column(DateTime, default=datetime.utcnow)
+
 class Agent(Base):
     __tablename__ = "agents"
     id = Column(String, primary_key=True, default=generate_uuid)

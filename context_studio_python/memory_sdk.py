@@ -16,11 +16,31 @@ def mock_embed(text: str) -> np.ndarray:
         vec[i] = (ord(text[i]) % 10) / 10.0
     return vec
 
+class PermissionDenied(Exception):
+    pass
+
 class MemoryEngine:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_context(self, agent_id: str, session_id: str, query: str):
+    def enforce_rbac(self, agent_id: str, session_id: str, security_context: dict):
+        role = security_context.get("role", "user")
+        user_id = security_context.get("user_id", "")
+        
+        if role == "admin":
+            return # Admins can access anything
+            
+        if role == "user":
+            # Users can only access sessions that belong strictly to them.
+            # In a real app, session_id often IS the user_id or explicitly tied to it.
+            # Here we enforce that the user_id must be part of the session string for isolation.
+            if user_id not in session_id:
+                raise PermissionDenied(f"User {user_id} cannot access session {session_id}")
+
+    def get_context(self, agent_id: str, session_id: str, query: str, security_context: dict):
+        # Enforce RBAC
+        self.enforce_rbac(agent_id, session_id, security_context)
+
         # 1. Working Memory (LRU Cache)
         wm_key = f"wm:{agent_id}:{session_id}"
         working_memory = working_memory_cache.get(wm_key, [])
@@ -48,7 +68,10 @@ class MemoryEngine:
             "procedural": procedural
         }
 
-    def write_back(self, agent_id: str, session_id: str, role: str, content: str, turn_number: int):
+    def write_back(self, agent_id: str, session_id: str, role: str, content: str, turn_number: int, security_context: dict):
+        # Enforce RBAC
+        self.enforce_rbac(agent_id, session_id, security_context)
+        
         # 1. Update Working Memory
         wm_key = f"wm:{agent_id}:{session_id}"
         current_wm = working_memory_cache.get(wm_key, [])

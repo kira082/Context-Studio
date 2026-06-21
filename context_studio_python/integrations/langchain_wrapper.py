@@ -21,13 +21,15 @@ class ContextStudioMemory(BaseMemory):
     """
     agent_id: str
     session_id: str
+    user_id: str
     memory_engine: Any  # The ContextStudio MemoryEngine instance
     memory_key: str = "context_studio_history"
 
-    def __init__(self, agent_id: str, session_id: str, memory_engine: Any, memory_key: str = "context_studio_history"):
+    def __init__(self, agent_id: str, session_id: str, user_id: str, memory_engine: Any, memory_key: str = "context_studio_history"):
         super().__init__()
         self.agent_id = agent_id
         self.session_id = session_id
+        self.user_id = user_id
         self.memory_engine = memory_engine
         self.memory_key = memory_key
 
@@ -45,8 +47,9 @@ class ContextStudioMemory(BaseMemory):
         if inputs:
             query = list(inputs.values())[-1]
 
-        # Fetch multi-tier context
-        context_data = self.memory_engine.get_context(self.agent_id, self.session_id, query)
+        # Fetch multi-tier context with SecurityContext
+        security = {"role": "user", "user_id": self.user_id}
+        context_data = self.memory_engine.get_context(self.agent_id, self.session_id, query, security)
         
         # Format the context into a string block for the LLM
         formatted_context = "=== CONTEXT STUDIO MEMORY ===\n"
@@ -80,13 +83,16 @@ class ContextStudioMemory(BaseMemory):
         from memory_sdk import working_memory_cache
         current_len = len(working_memory_cache.get(wm_key, []))
         
+        security = {"role": "user", "user_id": self.user_id}
+        
         # Write User turn
         self.memory_engine.write_back(
             agent_id=self.agent_id,
             session_id=self.session_id,
             role="user",
             content=user_input,
-            turn_number=current_len + 1
+            turn_number=current_len + 1,
+            security_context=security
         )
         
         # Write AI turn
@@ -95,7 +101,8 @@ class ContextStudioMemory(BaseMemory):
             session_id=self.session_id,
             role="assistant",
             content=ai_output,
-            turn_number=current_len + 2
+            turn_number=current_len + 2,
+            security_context=security
         )
 
     def clear(self) -> None:
