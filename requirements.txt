@@ -1,7 +1,10 @@
 fastapi
 uvicorn
 sqlalchemy
-numpy
 cachetools
+casbin
+casbin-sqlalchemy-adapter
 pydantic
 requests
+mcp
+numpy

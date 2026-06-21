@@ -1,9 +1,9 @@
-# Context Studio Tasks (Python Root & MCP)
+# Context Studio Tasks (PyCasbin RBAC)
 
-## Phase 7 — Repository Cleanup & Integrations
-- [ ] Delete `apps/`, `packages/`, Node.js configurations.
-- [ ] Move Python SDK code to repository root.
-- [ ] Create `integrations/mcp_server.py` with RBAC enforcement.
-- [ ] Rewrite `README.md` containing all 3 integration pathways (SDK, API, MCP).
-- [ ] Test the root-level imports and scripts.
-- [ ] Git commit and push to GitHub.
+## Phase 8 — PyCasbin Integration
+- [ ] Add `casbin` and `casbin-sqlalchemy-adapter` to `requirements.txt`.
+- [ ] Create `casbin_model.conf`.
+- [ ] Initialize Casbin Enforcer in `memory_sdk.py` using DB adapter.
+- [ ] Rewrite `enforce_rbac` to utilize `enforcer.enforce()`.
+- [ ] Test the Casbin security rules using `test_security.py`.
+- [ ] Commit and Push changes.

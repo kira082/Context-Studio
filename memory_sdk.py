@@ -3,6 +3,9 @@ import numpy as np
 from datetime import datetime
 from sqlalchemy.orm import Session
 from cachetools import TTLCache
+import casbin
+from casbin_sqlalchemy_adapter import Adapter
+from database import engine as db_engine
 import models
 
 # Working Memory Cache (Local RAM)
@@ -22,20 +25,39 @@ class PermissionDenied(Exception):
 class MemoryEngine:
     def __init__(self, db: Session):
         self.db = db
+        # Initialize Casbin Adapter with our SQLAlchemy engine
+        adapter = Adapter(db_engine)
+        self.enforcer = casbin.Enforcer("casbin_model.conf", adapter)
 
     def enforce_rbac(self, agent_id: str, session_id: str, security_context: dict):
         role = security_context.get("role", "user")
         user_id = security_context.get("user_id", "")
         
         if role == "admin":
-            return # Admins can access anything
+            return # Admins bypass via matcher
             
-        if role == "user":
-            # Users can only access sessions that belong strictly to them.
-            # In a real app, session_id often IS the user_id or explicitly tied to it.
-            # Here we enforce that the user_id must be part of the session string for isolation.
-            if user_id not in session_id:
-                raise PermissionDenied(f"User {user_id} cannot access session {session_id}")
+        # The 'subject' is the user_id (or agent_id if role is agent)
+        sub = user_id if role == "user" else agent_id
+        # The 'object' they want to access is the session_id
+        obj = session_id
+        # The 'action' is read_write
+        act = "read_write"
+
+        # Auto-grant access to users for their own session if it's their user_id
+        # This simulates a platform assigning permissions when a session is created.
+        if role == "user" and user_id in session_id:
+            # Add policy if it doesn't exist
+            if not self.enforcer.has_policy(sub, obj, act):
+                self.enforcer.add_policy(sub, obj, act)
+                
+        # Auto-grant access to agents for their own agent_id
+        if role == "agent" and agent_id == sub:
+             if not self.enforcer.has_policy(sub, obj, act):
+                self.enforcer.add_policy(sub, obj, act)
+
+        # Check PyCasbin policy
+        if not self.enforcer.enforce(sub, obj, act):
+            raise PermissionDenied(f"PyCasbin: Subject '{sub}' cannot access Session '{obj}'")
 
     def get_context(self, agent_id: str, session_id: str, query: str, security_context: dict):
         # Enforce RBAC
