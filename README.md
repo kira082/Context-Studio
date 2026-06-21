@@ -1,159 +1,90 @@
-# Turborepo starter
+# Context Studio 🧠
+A fully localized, production-ready **Memory Engine** for AI Agents.
 
-This Turborepo starter is maintained by the Turborepo core team.
+Context Studio implements a complete **5-Tier Cognitive Architecture** (Working, Conversational, Episodic, Semantic, and Procedural memory) directly on your local machine using SQLite and NumPy. No cloud, no docker, just blazing-fast local memory.
 
-## Using this example
+## Features
+- **Working Memory**: In-memory LRU cache for high-speed recent context.
+- **Conversational Memory**: Full dialogue history (SQLite).
+- **Episodic Memory**: Time-decayed local vector similarity search (NumPy).
+- **Semantic Memory**: Relational Knowledge Graph mapping (SQLite).
+- **Procedural Memory**: "If-Then" rules and triggers.
+- **Strict RBAC Security**: Granular Role-Based Access Control and API Key enforcement.
 
-Run the following command:
+---
 
-```sh
-npx create-turbo@latest
+# 🚀 The 3 Integration Pathways
+
+Context Studio is built as a highly modular Python SDK. You can integrate it into your platform in three ways:
+
+## 1. The SDK Integration (LangChain / LangGraph / ReAct)
+If you are building deep agents in Python using LangChain, you can directly inject Context Studio into your `LLMChain` or `StateGraph` as a native memory module.
+
+**Usage:**
+```python
+from integrations.langchain_wrapper import ContextStudioMemory
+from memory_sdk import MemoryEngine
+from database import SessionLocal
+
+# 1. Init Database
+db = SessionLocal()
+engine = MemoryEngine(db)
+
+# 2. Inject into LangChain!
+memory = ContextStudioMemory(
+    agent_id="YOUR_AGENT_ID",
+    session_id="SESSION_123",
+    user_id="USER_XYZ",
+    memory_engine=engine
+)
+
+# Now pass `memory` directly into your LangChain LLMChain!
 ```
 
-## What's inside?
+## 2. The API Integration (FastAPI REST for No-Code Builders)
+If you are using external platforms like n8n, React Flow, or a separate frontend, run the built-in FastAPI server to expose standard REST endpoints.
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+**Start the Server:**
+```bash
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8000
 ```
 
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo build
-npm dlx turbo build
-npm exec turbo build
+**Usage (cURL):**
+```bash
+# Save Memory (Requires API Key & RBAC Context)
+curl -X POST http://127.0.0.1:8000/api/memory \
+-H "Content-Type: application/json" \
+-H "X-API-Key: dev_key" \
+-d '{
+  "agent_id": "YOUR_AGENT_ID", 
+  "session_id": "session_user_A", 
+  "role": "user", 
+  "content": "My secret is 123", 
+  "turn_number": 1,
+  "security": {"role": "user", "user_id": "user_A"}
+}'
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## 3. The MCP Integration (Model Context Protocol)
+Context Studio comes with a native **FastMCP** server. You can hook it directly into Claude Desktop or Cursor so they can inherently read and write to your local memory graph!
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
+**Claude Desktop Config (`claude_desktop_config.json`):**
+```json
+{
+  "mcpServers": {
+    "context_studio": {
+      "command": "python",
+      "args": ["/path/to/Context-Studio/integrations/mcp_server.py"]
+    }
+  }
+}
 ```
+*(The MCP Server exposes tools like `init_agent`, `save_memory`, and `get_context` directly to the LLM UI).*
 
-Without global `turbo`:
+---
 
-```sh
-npx turbo build --filter=docs
-npm exec turbo build --filter=docs
-npm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-npm exec turbo dev
-npm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-npm exec turbo dev --filter=web
-npm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-npm exec turbo login
-npm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-npm exec turbo link
-npm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+### Security Note
+All read/write operations require a `SecurityContext` containing a `role` (`admin`, `agent`, `user`) and a `user_id`. The engine strictly enforces data isolation so users cannot bleed memories across sessions.

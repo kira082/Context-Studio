@@ -1,9 +1,9 @@
-# Context Studio Tasks (RBAC & Security)
+# Context Studio Tasks (Python Root & MCP)
 
-## Phase 6 — RBAC & Security Layer
-- [x] Add `ApiKey` table to `models.py`.
-- [x] Implement `APIKeyHeader` authentication in FastAPI (`main.py`).
-- [x] Define `SecurityContext` inside `schemas.py`.
-- [x] Create `enforce_rbac()` access control logic in `memory_sdk.py`.
-- [x] Update LangChain wrapper to inject `SecurityContext`.
-- [x] Write `test_security.py` to verify authentication and data isolation.
+## Phase 7 — Repository Cleanup & Integrations
+- [ ] Delete `apps/`, `packages/`, Node.js configurations.
+- [ ] Move Python SDK code to repository root.
+- [ ] Create `integrations/mcp_server.py` with RBAC enforcement.
+- [ ] Rewrite `README.md` containing all 3 integration pathways (SDK, API, MCP).
+- [ ] Test the root-level imports and scripts.
+- [ ] Git commit and push to GitHub.

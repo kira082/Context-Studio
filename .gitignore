@@ -4,6 +4,6 @@ dist/
 .DS_Store
 .system_generated/
 *.metadata.json
-context_studio_python/venv/
-context_studio_python/__pycache__/
+venv/
+__pycache__/
 *.db
