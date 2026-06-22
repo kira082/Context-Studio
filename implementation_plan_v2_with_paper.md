@@ -874,18 +874,18 @@ CREATE TABLE episodic_metadata (
 
 | Feature in Context Studio | Algorithm | Paper | Section |
 |:---|:---|:---|:---|
-| Episodic extraction | Single-pass ADD-only extraction | **Mem0** (2024) | §3.2 Write Pipeline |
-| Episodic time-decay | `0.5^(days/half_life * importance_mult)` | **Mem0** (2024) | §3.3 |
-| Retrieval multi-signal fusion | Semantic + Keyword + Entity matching | **Mem0** (2024) | §5.2 |
-| Contradiction resolution | Semantic supersession with `superseded_by` | **Mem0** (2024) | §10.1 |
-| Context paging & overflow | OS-inspired RAM/Disk paging model | **MemGPT** (2023) | §3.1, §5.5 |
-| Context budget optimization | Token budget allocation by slot type | **MemGPT** (2023) | §5.4 |
-| Agent self-interrupts | Interrupt-based context state machine | **MemGPT** (2023) | §3.1 |
-| Semantic lossless compression | 3-stage: compress → synthesize → plan | **SimpleMem** (2026) | §4, §5.1 |
-| Intent-aware retrieval planning | Query complexity estimation → scope | **SimpleMem** (2026) | §5.1 |
-| KG multi-hop retrieval | Personalized PageRank (PPR) | **HippoRAG** (NeurIPS 2024) | §4, §5.2 |
-| Associative memory traversal | Hippocampal indexing theory → KG seeds | **HippoRAG** (NeurIPS 2024) | §3.4 |
-| Community knowledge summaries | Leiden community detection | **GraphRAG** (Microsoft, 2024) | §3.7 |
-| Rank fusion across search paths | Standard RRF: `Σ 1/(k + rank(r,d))` | **RRF** (Cormack & Clarke, 2009) | §5.3 |
+| Episodic extraction | Single-pass ADD-only extraction | **Mem0** (2024) |
+| Episodic time-decay | `0.5^(days/half_life * importance_mult)` | **Mem0** (2024) |
+| Retrieval multi-signal fusion | Semantic + Keyword + Entity matching | **Mem0** (2024) | 
+| Contradiction resolution | Semantic supersession with `superseded_by` | **Mem0** (2024) |
+| Context paging & overflow | OS-inspired RAM/Disk paging model | **MemGPT** (2023) |
+| Context budget optimization | Token budget allocation by slot type | **MemGPT** (2023) |
+| Agent self-interrupts | Interrupt-based context state machine | **MemGPT** (2023) |
+| Semantic lossless compression | 3-stage: compress → synthesize → plan | **SimpleMem** (2026) |
+| Intent-aware retrieval planning | Query complexity estimation → scope | **SimpleMem** (2026) |
+| KG multi-hop retrieval | Personalized PageRank (PPR) | **HippoRAG** (NeurIPS 2024) |
+| Associative memory traversal | Hippocampal indexing theory → KG seeds | **HippoRAG** (NeurIPS 2024) | 
+| Community knowledge summaries | Leiden community detection | **GraphRAG** (Microsoft, 2024) |
+| Rank fusion across search paths | Standard RRF: `Σ 1/(k + rank(r,d))` | **RRF** (Cormack & Clarke, 2009) |
 | Configurable source weighting | Weighted RRF: `Σ w_r · 1/(k + rank(r,d))` | Production variant of RRF | §5.3 |
 | Benchmarking & evaluation | LoCoMo, LongMemEval, BEAM metrics | **Mem0** / **SimpleMem** benchmarks | §11 |
