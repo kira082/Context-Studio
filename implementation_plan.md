@@ -812,7 +812,7 @@ CREATE TABLE episodic_metadata (
 ---
 ## 15. Algorithm Index — Paper-to-Feature Mapping
 
-| Feature in Context Studio | Algorithm | Paper | Section |
+| Feature in Context Studio | Algorithm | Paper | 
 |:---|:---|:---|:---|
 | Episodic extraction | Single-pass ADD-only extraction | **Mem0** (2024) |
 | Episodic time-decay | `0.5^(days/half_life * importance_mult)` | **Mem0** (2024) |
@@ -827,5 +827,5 @@ CREATE TABLE episodic_metadata (
 | Associative memory traversal | Hippocampal indexing theory → KG seeds | **HippoRAG** (NeurIPS 2024) | 
 | Community knowledge summaries | Leiden community detection | **GraphRAG** (Microsoft, 2024) |
 | Rank fusion across search paths | Standard RRF: `Σ 1/(k + rank(r,d))` | **RRF** (Cormack & Clarke, 2009) |
-| Configurable source weighting | Weighted RRF: `Σ w_r · 1/(k + rank(r,d))` | Production variant of RRF | §5.3 |
-| Benchmarking & evaluation | LoCoMo, LongMemEval, BEAM metrics | **Mem0** / **SimpleMem** benchmarks | §11 |
+| Configurable source weighting | Weighted RRF: `Σ w_r · 1/(k + rank(r,d))` | Production variant of RRF |
+| Benchmarking & evaluation | LoCoMo, LongMemEval, BEAM metrics | **Mem0** / **SimpleMem** benchmarks |
