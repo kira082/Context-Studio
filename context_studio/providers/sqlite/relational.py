@@ -69,6 +69,45 @@ class SQLiteRelationalProvider(RelationalProvider):
                     UNIQUE(tenant_id, user_id)
                 )
             ''')
+            # semantic_facts
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS semantic_facts (
+                    id TEXT PRIMARY KEY,
+                    tenant_id TEXT NOT NULL,
+                    agent_id TEXT,
+                    subject TEXT NOT NULL,
+                    predicate TEXT NOT NULL,
+                    object_val TEXT NOT NULL,
+                    confidence REAL DEFAULT 0.7,
+                    corroboration_count INTEGER DEFAULT 1,
+                    status TEXT DEFAULT 'active',
+                    superseded_by TEXT REFERENCES semantic_facts(id),
+                    valid_from REAL,
+                    valid_until REAL,
+                    lineage TEXT,
+                    created_at REAL
+                )
+            ''')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_facts_tenant_subject ON semantic_facts(tenant_id, subject)')
+            
+            # episodic_metadata
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS episodic_metadata (
+                    id TEXT PRIMARY KEY,
+                    tenant_id TEXT NOT NULL,
+                    agent_id TEXT NOT NULL,
+                    session_id TEXT NOT NULL,
+                    episode_type TEXT,
+                    summary TEXT NOT NULL,
+                    outcome TEXT,
+                    importance_score INTEGER DEFAULT 5,
+                    decay_score REAL DEFAULT 1.0,
+                    access_count INTEGER DEFAULT 0,
+                    last_accessed_at REAL,
+                    lineage TEXT,
+                    created_at REAL
+                )
+            ''')
             
             conn.commit()
 

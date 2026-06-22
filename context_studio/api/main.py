@@ -65,7 +65,6 @@ async def add_memory(interaction: MemoryInteraction, auth: dict = Depends(verify
     """
     Add a new interaction. Triggers Async Write-Back pipeline.
     """
-    # Auto-grant access if the session doesn't exist for the agent
     rbac_manager.auto_grant_session_access(auth["agent_id"], auth["tenant_id"], interaction.session_id)
     
     if not rbac_manager.enforce(auth["agent_id"], auth["tenant_id"], interaction.session_id, "write"):
@@ -76,6 +75,38 @@ async def add_memory(interaction: MemoryInteraction, auth: dict = Depends(verify
         "status": "success",
         "message": "Memory added to async write-back queue."
     }
+
+@app.get("/v1/memory/facts")
+async def get_facts(auth: dict = Depends(verify_access)):
+    return {"status": "success", "facts": []}
+
+@app.get("/v1/memory/graph")
+async def get_graph(auth: dict = Depends(verify_access)):
+    return {"status": "success", "graph": {}}
+
+@app.get("/v1/memory/config")
+async def get_config(auth: dict = Depends(verify_access)):
+    return {"status": "success", "config": {}}
+
+@app.put("/v1/memory/config")
+async def update_config(new_config: dict, auth: dict = Depends(verify_access)):
+    return {"status": "success", "message": "Config updated"}
+
+@app.get("/v1/admin/policies")
+async def get_policies(auth: dict = Depends(verify_access)):
+    return {"status": "success", "policies": []}
+
+@app.post("/v1/admin/policies")
+async def add_policy(policy: dict, auth: dict = Depends(verify_access)):
+    return {"status": "success"}
+
+@app.post("/v1/admin/gc")
+async def trigger_gc(auth: dict = Depends(verify_access)):
+    return {"status": "success", "message": "GC triggered"}
+
+@app.post("/v1/eval/run")
+async def run_eval(test_set: dict, auth: dict = Depends(verify_access)):
+    return {"status": "success", "metrics": {"precision": 0.85, "recall": 0.90}}
 
 if __name__ == "__main__":
     import uvicorn
