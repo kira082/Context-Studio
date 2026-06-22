@@ -812,7 +812,7 @@ CREATE TABLE episodic_metadata (
 ---
 ## 15. Algorithm Index — Paper-to-Feature Mapping
 
-| Feature in Context Studio | Algorithm | Paper | 
+| Feature in Context Studio | Algorithm | Paper |Remark|
 |:---|:---|:---|:---|
 | Episodic extraction | Single-pass ADD-only extraction | **Mem0** (2024) |
 | Episodic time-decay | `0.5^(days/half_life * importance_mult)` | **Mem0** (2024) |
