@@ -1,7 +1,7 @@
 # Context Studio — Implementation Plan v2 (Research-Enhanced Production Edition)
 
- > **Date:** 2026-06-21
- > **Research Foundation:** Mem0, MemGPT, SimpleMem, HippoRAG, GraphRAG (Microsoft), RAPTOR, RRF (Cormack & Clarke 2009)
+**Date:** 2026-06-21
+**Research Foundation:** Mem0, MemGPT, SimpleMem, HippoRAG, GraphRAG (Microsoft), RAPTOR, RRF (Cormack & Clarke 2009)
 
 
 
@@ -21,8 +21,7 @@
 12. [Integration Layer (API, SDK, MCP)](#12-integration-layer-api-sdk-mcp)
 13. [Boundary Cases & Edge Cases — All Handled](#13-boundary-cases--edge-cases--all-handled)
 14. [Database Schemas](#14-database-schemas)
-15. [Phase-by-Phase Implementation](#15-phase-by-phase-implementation)
-16. [Algorithm Index — Paper-to-Feature Mapping](#16-algorithm-index--paper-to-feature-mapping)
+15. [Algorithm Index — Paper-to-Feature Mapping](#15-algorithm-index--paper-to-feature-mapping)
 
 ---
 
@@ -810,65 +809,8 @@ CREATE TABLE episodic_metadata (
     lineage          TEXT,
     created_at       REAL DEFAULT (unixepoch())
 );
-```
 
----
-
-## 15. Phase-by-Phase Implementation
-
-### Phase 1 — Core Foundation (Weeks 1–2)
-- [ ] Directory scaffolding & environment setup
-- [ ] Abstract Storage Provider interfaces (`CacheProvider`, `RelationalProvider`, `VectorProvider`, `GraphProvider`)
-- [ ] File System implementation of all 4 providers (offline/dev mode)
-- [ ] `MemoryConfig` + `RetrievalConfig` + `StrategyConfig` + `GovernanceConfig` dataclasses
-- [ ] PyCasbin RBAC layer (model, enforcer, auto-grant policies)
-- [ ] FastAPI scaffold with `/health`, `/memory/add`, `/memory/search`
-
-### Phase 2 — Memory Storage & Write Pipeline (Weeks 3–4)
-- [ ] Tier 0 Working Memory: TTL cache with MemGPT paging interrupt
-- [ ] Tier 1 Conversational: turn storage + sliding window summarization
-- [ ] Tier 2 Episodic: async LLM episode extractor + importance scorer + Mem0 decay
-- [ ] Tier 3 Semantic: KG triple extractor + entity resolution + contradiction resolver
-- [ ] Tier 4 Procedural + Tier 5 User Preference + Tier 6 Org Memory
-- [ ] SQLite + FAISS local providers for production-lite mode
-
-### Phase 3 — Advanced Retrieval Engine (Weeks 5–6)
-- [ ] SimpleMem: Intent-Aware Retrieval Planner
-- [ ] Dense ANN search (VectorProvider)
-- [ ] BM25 sparse search (RelationalProvider)
-- [ ] HippoRAG Personalized PageRank (GraphProvider)
-- [ ] Standard RRF merger
-- [ ] Weighted RRF merger
-- [ ] Cross-Encoder Re-Ranker (bge-reranker local)
-- [ ] MemGPT Context Budget Optimizer
-
-### Phase 4 — Governance, GC & Evaluation (Week 7)
-- [ ] Contradiction Resolution Engine (Mem0 semantic supersession)
-- [ ] Time-decay background worker
-- [ ] Garbage Collection cron job
-- [ ] Data Lineage tracker
-- [ ] GraphRAG: Leiden community detection (optional, config-gated)
-- [ ] Evaluation harness: Context Precision, Recall, Faithfulness
-
-### Phase 5 — Production Storage Providers (Week 8)
-- [ ] Redis `CacheProvider`
-- [ ] PostgreSQL `RelationalProvider`
-- [ ] Qdrant `VectorProvider`
-- [ ] Neo4j `GraphProvider`
-- [ ] Pinecone / Chroma / Milvus provider stubs
-
-### Phase 6 — Integration Layer (Weeks 9–10)
-- [ ] REST API (all endpoints with OpenAPI docs)
-- [ ] LangChain / LangGraph adapter
-- [ ] AutoGen adapter
-- [ ] CrewAI adapter
-- [ ] Google ADK adapter
-- [ ] FastMCP Server (`stdio`) with all 7 exposed tools
-- [ ] SDK packaging (`pyproject.toml`, versioning)
-
----
-
-## 16. Algorithm Index — Paper-to-Feature Mapping
+## 15. Algorithm Index — Paper-to-Feature Mapping
 
 | Feature in Context Studio | Algorithm | Paper | Section |
 |:---|:---|:---|:---|
