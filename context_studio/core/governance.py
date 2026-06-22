@@ -68,3 +68,12 @@ class GovernanceManager:
             "agent_id": agent_id,
             "timestamp": time.time()
         }
+
+    async def run_community_detection(self):
+        """
+        GraphRAG: Leiden Community Detection.
+        Periodically groups related nodes into communities and generates summaries.
+        """
+        print("Running Leiden Community Detection... (Mock)")
+        # In production, this would call self.graph_provider.run_leiden_algorithm()
+        # and then extract summaries via an LLM.

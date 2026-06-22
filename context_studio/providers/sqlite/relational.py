@@ -15,18 +15,61 @@ class SQLiteRelationalProvider(RelationalProvider):
     def _init_db(self):
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
+            
+            # conversation_turns
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS conversation_turns (
                     id TEXT PRIMARY KEY,
+                    tenant_id TEXT NOT NULL DEFAULT 'default',
+                    agent_id TEXT NOT NULL DEFAULT 'default',
                     session_id TEXT NOT NULL,
+                    user_id TEXT,
+                    turn_number INTEGER NOT NULL,
                     role TEXT NOT NULL,
                     content TEXT NOT NULL,
-                    turn_number INTEGER,
+                    token_count INTEGER,
                     metadata TEXT,
                     created_at REAL
                 )
             ''')
-            cursor.execute('CREATE INDEX IF NOT EXISTS idx_session ON conversation_turns(session_id)')
+            cursor.execute('CREATE INDEX IF NOT EXISTS idx_turns_session ON conversation_turns(session_id, turn_number)')
+            
+            # procedural_rules
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS procedural_rules (
+                    id TEXT PRIMARY KEY,
+                    tenant_id TEXT NOT NULL,
+                    agent_id TEXT,
+                    name TEXT NOT NULL,
+                    rule_type TEXT NOT NULL,
+                    trigger_condition TEXT NOT NULL,
+                    action_sequence TEXT NOT NULL,
+                    priority INTEGER DEFAULT 50,
+                    confidence REAL DEFAULT 1.0,
+                    learned INTEGER DEFAULT 0,
+                    status TEXT DEFAULT 'active',
+                    created_at REAL
+                )
+            ''')
+            
+            # user_preferences
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS user_preferences (
+                    id TEXT PRIMARY KEY,
+                    tenant_id TEXT NOT NULL,
+                    user_id TEXT NOT NULL,
+                    response_style TEXT DEFAULT 'balanced',
+                    technical_level TEXT DEFAULT 'intermediate',
+                    tone TEXT DEFAULT 'professional',
+                    common_topics TEXT DEFAULT '[]',
+                    explicit_prefs TEXT DEFAULT '{}',
+                    interaction_count INTEGER DEFAULT 0,
+                    confidence REAL DEFAULT 0.3,
+                    updated_at REAL,
+                    UNIQUE(tenant_id, user_id)
+                )
+            ''')
+            
             conn.commit()
 
     async def save_turn(self, session_id: str, turn_data: Dict[str, Any]) -> str:
