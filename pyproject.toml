@@ -17,7 +17,8 @@ dependencies = [
     "fastapi>=0.100.0",
     "uvicorn>=0.23.0",
     "casbin>=3.0.0",
-    "litellm>=1.0.0"
+    "litellm>=1.0.0",
+    "httpx>=0.24.0"
 ]
 
 [project.optional-dependencies]
