@@ -47,43 +47,54 @@ It integrates discoveries from the following research papers:
 
 ```mermaid
 graph TB
+    subgraph Execution["Execution Engine (External)"]
+        Sandbox["Sandbox System<br/>(Docker / E2B)"]
+        ToolReg["Tool Registry"]
+    end
+
     subgraph Integrations["Integration Layer (Pluggable)"]
-        API["REST API<br/>(FastAPI — No-Code / N8N)"]
-        SDK["Native Python SDK<br/>(LangChain / LangGraph / AutoGen / CrewAI / ADK)"]
-        MCP["MCP Server<br/>(Claude / Cursor / Pi / any MCP client)"]
+        API["REST API<br/>(FastAPI)"]
+        SDK["Native Python SDK<br/>(LangChain / AutoGen / CrewAI / ADK)"]
+        MCP["MCP Server<br/>(Claude / Cursor)"]
+        TB["ToolExecutionBridge<br/>(Intercepts & Logs Tools)"]
     end
 
     subgraph Core["Context Studio Core Engine"]
         RBAC["RBAC & Auth Layer<br/>(PyCasbin)"]
         ORCH["Memory Orchestrator<br/>(MemoryConfig-driven)"]
+        LLM["Universal LLM Provider<br/>(LiteLLM)"]
+        SKILL["SkillLearner<br/>(Pattern Detection)"]
         
         subgraph Write["Write Pipeline (Async)"]
-            COMP["SimpleMem: Semantic Structured Compression"]
-            SYNTH["SimpleMem: Online Semantic Synthesis"]
-            EXT["Mem0: Entity + Triple Extractor"]
-            CONTR["Contradiction Resolution Engine<br/>(Semantic Supersession)"]
+            COMP["SimpleMem: Semantic Compression"]
+            SYNTH["SimpleMem: Online Synthesis"]
+            EXT["LLM-Powered Extractor<br/>(Episodes + Triples)"]
+            CONTR["Contradiction Engine"]
         end
         
         subgraph Read["Read Pipeline"]
-            INTPLAN["SimpleMem: Intent-Aware Retrieval Planning"]
+            INTPLAN["LLM Intent Planner"]
             HYB["Hybrid Search<br/>(Dense + Sparse + Graph)"]
-            RRF["RRF Fusion<br/>(Standard / Weighted)"]
-            RERANK["Cross-Encoder Re-Ranker<br/>(bge-reranker / Cohere)"]
-            BUDGET["MemGPT: Context Budget Optimizer"]
+            RRF["RRF Fusion"]
+            BUDGET["Context Budget Optimizer"]
         end
     end
 
     subgraph Storage["Pluggable Storage (Bring Your Own)"]
-        CACHE["CacheProvider<br/>Redis / Memcached / Local"]
-        REL["RelationalProvider<br/>PostgreSQL / SQLite / File"]
-        VEC["VectorProvider<br/>Qdrant / Pinecone / Milvus / Chroma / FAISS / File"]
-        GRAPH["GraphProvider<br/>Neo4j / PostgreSQL AGE / NetworkX / File"]
+        CACHE["CacheProvider<br/>(Working Memory)"]
+        REL["RelationalProvider<br/>(Conversational/Procedural/User)"]
+        VEC["VectorProvider<br/>(Episodic Memory)"]
+        GRAPH["GraphProvider<br/>(Semantic KG)"]
     end
 
+    Execution <--> TB
     Integrations --> RBAC
     RBAC --> ORCH
+    ORCH <--> LLM
     ORCH --> Write
     ORCH --> Read
+    ORCH --> SKILL
+    SKILL --> REL
     Write --> Storage
     Read --> Storage
 ```
