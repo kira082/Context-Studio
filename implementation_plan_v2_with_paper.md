@@ -1,7 +1,6 @@
 # Context Studio — Implementation Plan v2 (Research-Enhanced Production Edition)
 
 **Date:** 2026-06-21
-**Research Foundation:** Mem0, MemGPT, SimpleMem, HippoRAG, GraphRAG (Microsoft), RAPTOR, RRF (Cormack & Clarke 2009)
 
 
 
