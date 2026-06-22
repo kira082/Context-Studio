@@ -12,10 +12,12 @@ authors = [
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [
+    "pydantic>=2.0.0",
+    "numpy>=1.24.0",
     "fastapi>=0.100.0",
     "uvicorn>=0.23.0",
-    "pydantic>=2.0.0",
     "casbin>=3.0.0",
+    "litellm>=1.0.0"
 ]
 
 [project.optional-dependencies]

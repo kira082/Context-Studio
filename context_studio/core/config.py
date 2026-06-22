@@ -2,6 +2,12 @@ from dataclasses import dataclass, field
 from typing import Optional, Dict, Any
 
 @dataclass
+class LLMConfig:
+    model_name: str = "gpt-4o-mini"
+    api_base: Optional[str] = None
+    api_key: Optional[str] = None
+    enabled: bool = False
+
 class RetrievalConfig:
     hybrid_search: bool = True
     enable_graph_traversal: bool = False
@@ -45,3 +51,4 @@ class MemoryConfig:
     retrieval: RetrievalConfig = field(default_factory=RetrievalConfig)
     strategy: StrategyConfig = field(default_factory=StrategyConfig)
     governance: GovernanceConfig = field(default_factory=GovernanceConfig)
+    llm: LLMConfig = field(default_factory=LLMConfig)
