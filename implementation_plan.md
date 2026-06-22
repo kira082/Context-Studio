@@ -808,7 +808,7 @@ CREATE TABLE episodic_metadata (
     lineage          TEXT,
     created_at       REAL DEFAULT (unixepoch())
 );
-
+---
 ## 15. Algorithm Index — Paper-to-Feature Mapping
 
 | Feature in Context Studio | Algorithm | Paper | Section |
